@@ -21,8 +21,6 @@ function Install-Boxstarter {
 
         .LINK
             https://boxstarter.org/
-
-        .LINK
             https://boxstarter.org/installboxstarter#installing-from-the-web
     #>
 
@@ -71,7 +69,6 @@ function Install-EdgeExtension {
             https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home
             https://chrome.google.com/webstore/category/extensions
             edge://extensions
-        
     #>
 
     [CmdletBinding()]
@@ -109,18 +106,46 @@ function Install-EdgeExtension {
 
 
 function Test-EdgeExtensionUrl {
+    <#
+        .SYNOPSIS
+            Determines whether an Edge extension URL is valid.
+
+        .DESCRIPTION
+            Determines whether an Edge extension URL is valid by:
+                1. Testing if the URL matches the pattern of a an Edge or Chrome extension page.
+                2. Testing if the URL is reachable (using Test-Url)
+
+            Returns $True if the URL is valid, else $False.
+
+        .INPUTS
+            System.String
+                You can pipe extension URLs to this function.
+        
+        .OUTPUTS
+            System.Boolean
+
+        .EXAMPLE
+            Test-EdgeExtensionUrl -Url "https://microsoftedge.microsoft.com/addons/detail/dark-reader/ifoakfbpdcdoeenechcleahebpibofpc"
+
+        .LINK
+            Test-Url
+            https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home
+            https://chrome.google.com/webstore/category/extensions
+    #>
+
     [CmdletBinding()]
     [OutputType([Boolean])]
     param(
+        # URL to test
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [AllowEmptyString()]
         [String] $Url
     )
 
     process {
-        $ExUrlRegex = "https://(?:microsoftedge`.microsoft`.com/addons)|(?:chrome`.google`.com/webstore)/detail/.+"
+        $ExtUrlRegex = "https://(?:microsoftedge`.microsoft`.com/addons)|(?:chrome`.google`.com/webstore)/detail/.+?/[a-p]{32}"
 
-        if ($Url -match $ExUrlRegex) {
+        if ($Url -match $ExtUrlRegex) {
             Test-Url -Url $Url
         } else {
             $False
