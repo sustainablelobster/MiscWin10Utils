@@ -1,14 +1,46 @@
 function Install-Boxstarter {
-    [System.Net.ServicePointManager]::SecurityProtocol = 
-            [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://boxstarter.org/bootstrapper.ps1'))
-    Get-Boxstarter -Force
+    <#
+        .SYNOPSIS
+            Installs Boxstarter.
+
+        .DESCRIPTION
+            Downloads and installs Boxstarter, a tool "to automate the installation of software and create 
+            repeatable, scripted Windows environments."
+
+        .INPUTS
+            None.
+
+        .OUTPUTS
+            None.
+
+        .EXAMPLE
+            Install-Boxstarter
+
+        .NOTES
+            Function body is based on Boxstarter's "installing from the web" instructions.
+
+        .LINK
+            https://boxstarter.org/
+
+        .LINK
+            https://boxstarter.org/installboxstarter#installing-from-the-web
+    #>
+
+    [CmdletBinding()]
+    param()
+
+    process {
+        $SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        [System.Net.ServicePointManager]::SecurityProtocol = $SecurityProtocol
+        $BootstrapperUrl = "https://boxstarter.org/bootstrapper.ps1"
+        Invoke-Expression -Command ((New-Object System.Net.WebClient).DownloadString($BootstrapperUrl))
+        Get-Boxstarter -Force
+    }
 }
 
 
 function Install-EdgeExtension {
     [CmdletBinding()]
-    
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [string] $ExtensionURL
@@ -32,6 +64,36 @@ function Install-EdgeExtension {
         Set-ItemProperty -Path $ExtensionKey -Name "update_url" -Value $UpdateURL -Force
     }
     
+}
+
+
+function Test-Uri {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline)]
+        [AllowEmptyString()]
+        [String] $Uri
+    )
+
+    begin {
+        $ErrorActionPreference = "Stop"
+    }
+
+    process {
+        $InvokeWebRequestParams = @{
+            Uri = $Uri
+            Method = "Head"
+            UseBasicParsing = $True
+            DisableKeepAlive = $True
+        }
+
+        try {
+            (Invoke-WebRequest @InvokeWebRequestParams).StatusCode -eq 200
+        } catch {
+            $False
+        }
+    }
 }
 
 
