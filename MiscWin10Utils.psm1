@@ -8,10 +8,10 @@ function Install-Boxstarter {
             repeatable, scripted Windows environments."
 
         .INPUTS
-            None.
+            None
 
         .OUTPUTS
-            None.
+            None
 
         .EXAMPLE
             Install-Boxstarter
@@ -27,6 +27,7 @@ function Install-Boxstarter {
     #>
 
     [CmdletBinding()]
+    [OutputType([Void])]
     param()
 
     process {
@@ -40,40 +41,47 @@ function Install-Boxstarter {
 
 
 function Install-EdgeExtension {
+    <#
+        .SYNOPSIS
+            Installs the given Edge extension.
+
+        .DESCRIPTION
+            Installs a Microsoft Edge extension from the given Edge Add-ons / Chrome Web Store URL. The extension 
+            must be manually activated in Edge's Extensions panel (edge://extensions). "Allow extensions from other
+            stores" must be enabled in the Extensions panel to allow extensions from the Chrome Web Store.
+
+        .INPUTS
+            System.String
+                You can pipe extension URLs to this function.
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Install-EdgeExtension -ExtensionUrl "https://microsoftedge.microsoft.com/addons/detail/dark-reader/ifoakfbpdcdoeenechcleahebpibofpc"
+
+            Install the "Dark Reader" extension from the Edge Add-ons store.
+
+        .EXAMPLE
+            Install-EdgeExtension -ExtensionUrl "https://chrome.google.com/webstore/detail/picture-in-picture-extens/hkgfoiooedgoejojocmhlaklaeopbecg"
+
+            Install the "Picture-in-Picture Extension (by Google)" extension from the Chrome Web Store.
+
+        .LINK
+            https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home
+            https://chrome.google.com/webstore/category/extensions
+            edge://extensions
+        
+    #>
+
     [CmdletBinding()]
+    [OutputType([Void])]
     param(
+        # URL of the extension's Edge Add-ons page or Chrome Web Store page.
         [Parameter(Mandatory = $true, ValueFromPipeline)]
-        [string] $ExtensionURL
-    )
-
-    begin {
-        $ExtensionsRootKey = "HKCU:\SOFTWARE\Microsoft\Edge\Extensions"
-    }
-
-    process {
-        $ExtensionID = $ExtensionURL.Split("/")[-1]
-        $ExtensionKey = $ExtensionsRootKey + "\" + $ExtensionID
-
-        if ($ExtensionURL -match "chrome`.google`.com") {
-            $UpdateURL = "https://clients2.google.com/service/update2/crx"
-        } else {
-            $UpdateURL = "https://edge.microsoft.com/extensionwebstorebase/v1/crx"
-        }
-
-        New-Item -Path $ExtensionKey -Force
-        Set-ItemProperty -Path $ExtensionKey -Name "update_url" -Value $UpdateURL -Force
-    }
-    
-}
-
-
-function Test-Uri {
-    [CmdletBinding()]
-    [OutputType([Boolean])]
-    param(
-        [Parameter(Mandatory = $true, ValueFromPipeline)]
-        [AllowEmptyString()]
-        [String] $Uri
+        [ValidateScript({ Test-EdgeExtensionUrl -Url $_ })]
+        [String]
+        $ExtensionUrl
     )
 
     begin {
@@ -81,11 +89,66 @@ function Test-Uri {
     }
 
     process {
+        $ExtensionID = $ExtensionUrl.Split("/")[-1]
+        if ($ExtensionID.Contains("?")) {
+            $ExtensionID = $ExtensionID.Substring(0, $ExtensionID.LastIndexOf("?"))
+        }
+        
+
+        $ExtensionKey = Join-Path -Path "HKCU:\SOFTWARE\Microsoft\Edge\Extensions" -ChildPath $ExtensionID
+
+        $UpdateURL = switch -Wildcard ($ExtensionUrl) {
+            "https://chrome.google.com/webstore/detail/*" { "https://clients2.google.com/service/update2/crx" }
+            Default { "https://edge.microsoft.com/extensionwebstorebase/v1/crx" }
+        }
+
+        New-Item -Path $ExtensionKey -Force | Out-Null
+        Set-ItemProperty -Path $ExtensionKey -Name "update_url" -Value $UpdateURL -Force
+    }
+}
+
+
+function Test-EdgeExtensionUrl {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline)]
+        [AllowEmptyString()]
+        [String] $Url
+    )
+
+    process {
+        $ExUrlRegex = "https://(?:microsoftedge`.microsoft`.com/addons)|(?:chrome`.google`.com/webstore)/detail/.+"
+
+        if ($Url -match $ExUrlRegex) {
+            Test-Url -Url $Url
+        } else {
+            $False
+        }
+    }
+}
+
+
+function Test-Url {
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline)]
+        [AllowEmptyString()]
+        [String] $Url
+    )
+
+    begin {
+        $ProgressPreference = "SilentlyContinue"
+    }
+
+    process {
         $InvokeWebRequestParams = @{
-            Uri = $Uri
+            Uri = $Url
             Method = "Head"
             UseBasicParsing = $True
             DisableKeepAlive = $True
+            ErrorAction = "Stop"
         }
 
         try {
