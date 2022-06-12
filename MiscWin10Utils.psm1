@@ -416,52 +416,156 @@ function Test-Virtualization {
 }
 
 
-function Enable-WindowsFeaturesFromJson {
+# function Enable-WindowsFeaturesFromJson {
+#     param(
+#         [Parameter(Mandatory = $true)]
+#         [string] $Json,
+#         [Parameter(Mandatory = $false)]
+#         [switch] $Restart = $false
+#     )
+
+#     $Features = (Get-Content -Path $Json | ConvertFrom-Json)
+#     $VirtualizationEnabled = Test-Virtualization
+
+#     foreach ($Feature in $Features) {
+#         if ($Feature.requiresVirtualization -and -not $VirtualizationEnabled) {
+#             continue
+#         }
+
+#         Enable-WindowsOptionalFeature -FeatureName $Feature.name -Online -All -NoRestart
+#     }
+
+#     if ($Restart) {
+#         Restart-Computer -Force
+#     }
+# }
+
+
+function Enable-ExplorerQuickAccess {
+    <#
+        .SYNOPSIS
+            Enables the Quick Access menu in Explorer system-wide.
+
+        .DESCRIPTION
+            Enables the Quick Access menu in Explorer system-wide. Changes may not take effect until Explorer is
+            restarted. Must be run as Administrator.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-ExplorerQuickAccess -Restart
+
+            Enable Quick Access and restart explorer.exe so changes take effect immediately.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param(
-        [Parameter(Mandatory = $true)]
-        [string] $Json,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $Restart = $false
+        [Switch]
+        $RestartExplorer
     )
 
-    $Features = (Get-Content -Path $Json | ConvertFrom-Json)
-    $VirtualizationEnabled = Test-Virtualization
-
-    foreach ($Feature in $Features) {
-        if ($Feature.requiresVirtualization -and -not $VirtualizationEnabled) {
-            continue
-        }
-
-        Enable-WindowsOptionalFeature -FeatureName $Feature.name -Online -All -NoRestart
+    process {
+        Set-ExplorerQuickAccess -Value 0 -RestartExplorer:$RestartExplorer
     }
+}
 
-    if ($Restart) {
-        Restart-Computer -Force
+
+function Disable-ExplorerQuickAccess {
+    <#
+        .SYNOPSIS
+            Disables the Quick Access menu in Explorer system-wide.
+
+        .DESCRIPTION
+            Disables the Quick Access menu in Explorer system-wide. Changes may not take effect until Explorer is
+            restarted. Must be run as Administrator.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Disable-ExplorerQuickAccess -Restart
+
+            Disable Quick Access and restart explorer.exe so changes take effect immediately.
+    #>
+    
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param(
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-ExplorerQuickAccess -Value 1 -RestartExplorer:$RestartExplorer
     }
 }
 
 
 function Set-ExplorerQuickAccess {
+        <#
+        .SYNOPSIS
+            Enables or disables the Quick Access menu in Explorer system-wide.
+
+        .DESCRIPTION
+            Enables or disables the Quick Access menu in Explorer system-wide. Changes may not take effect until 
+            Explorer is restarted. Must be run as Administrator.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-ExplorerQuickAccess -Value 1 -RestartExplorer
+
+            Disable Quick Access and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-ExplorerQuickAccess -Value 0
+
+            Enable Quick Access. Changes will not take effect until explorer.exe is restarted.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param(
+        # HubMode value: 0 to enable Quick Access, 1 to disable
+        [Parameter(Mandatory = $true)]
+        [ValidateRange(0, 1)]
+        [Int]
+        $Value,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $Enable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $Disable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer
+        [Switch]
+        $RestartExplorer
     )
 
-    $ExplorerKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"
-    
-    $HubModeValue = 0 
-    if ($Disable) {
-        $HubModeValue = 1
-    } 
-    
-    Set-ItemProperty -Path $ExplorerKey -Name "HubMode" -Value $HubModeValue -Force
+    process {
+        $SetItemPropertyParams = @{
+            Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer"
+            Name = "HubMode"
+            Value = $Value
+            Force = $true
+        }
 
-    if ($RestartExplorer) {
-        Restart-Explorer
+        Set-ItemProperty @SetItemPropertyParams
+
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
     }
 }
 
