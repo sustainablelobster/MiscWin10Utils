@@ -115,7 +115,7 @@ function Test-EdgeExtensionUrl {
                 1. Testing if the URL matches the pattern of a an Edge or Chrome extension page.
                 2. Testing if the URL is reachable (using Test-Url)
 
-            Returns $True if the URL is valid, else $False.
+            Returns $true if the URL is valid, else $false.
 
         .INPUTS
             System.String
@@ -148,7 +148,7 @@ function Test-EdgeExtensionUrl {
         if ($Url -match $ExtUrlRegex) {
             Test-Url -Url $Url
         } else {
-            $False
+            $false
         }
     }
 }
@@ -160,8 +160,8 @@ function Test-Url {
             Determines whether a URL is reachable.
 
         .DESCRIPTION
-            Determines whether a URL is reachable by attempting an HTTP HEAD request. Returns $True if the request
-            is successful, else $False.
+            Determines whether a URL is reachable by attempting an HTTP HEAD request. Returns $true if the request
+            is successful, else $false.
 
         .INPUTS
             System.String
@@ -191,15 +191,15 @@ function Test-Url {
         $InvokeWebRequestParams = @{
             Uri = $Url
             Method = "Head"
-            UseBasicParsing = $True
-            DisableKeepAlive = $True
+            UseBasicParsing = $true
+            DisableKeepAlive = $true
             ErrorAction = "Stop"
         }
 
         try {
             (Invoke-WebRequest @InvokeWebRequestParams).StatusCode -eq 200
         } catch {
-            $False
+            $false
         }
     }
 }
@@ -212,6 +212,7 @@ function Install-VSCodeExtension {
 
         .DESCRIPTION
             Installs the given Visual Studio Code extension from either extension ID or path to a local .vsix file.
+            Visual Studio Code must be installed.
 
         .INPUTS
             System.String
@@ -231,6 +232,7 @@ function Install-VSCodeExtension {
             Install the "Python" extension by Microsoft from a local .vsix file.
 
         .LINK
+            code --help
             https://marketplace.visualstudio.com/vscode
             https://code.visualstudio.com/
     #>
@@ -261,39 +263,115 @@ function Install-VSCodeExtension {
 
 
 function ConvertTo-WSLPath {
+    <#
+        .SYNOPSIS
+            Converts a Windows path to its corresponding WSL path.
+
+        .DESCRIPTION
+            Converts the given Windows path to its corresponding WSL path using the "wslpath" command. The Windows
+            Subsystem for Linux feature must be enabled.
+
+        .INPUTS
+            System.String
+                You can pipe paths to this function.
+        
+        .OUTPUTS
+            System.String
+
+        .EXAMPLE
+            ConvertTo-WSLPath -Path "." -Full
+
+            Get the full WSL path of the current directory.
+
+        .EXAMPLE
+            ConvertTo-WSLPath -Path ".\dir\subdir\file.bin"
+
+            Get the relative WSL path of the given Windows path.
+
+        .EXAMPLE
+            (Get-ChildItem -Path "." -Recurse).FullName | ConvertTo-WSLPath
+
+            Get WSL paths for every item in the current directory.
+
+        .LINK
+            wsl wslpath
+            wsl --help
+            https://docs.microsoft.com/en-us/windows/wsl/about
+    #>
+
+    [CmdletBinding()]
+    [OutputType([String])]
     param(
-        [Parameter(Mandatory = $true)]
-        [string] $Path,
+        # Windows path to convert
+        [Parameter(Mandatory = $true, ValueFromPipeline)]
+        [String] $Path,
+        # Use the Full switch to get get the full path (default is relative)
         [Parameter(Mandatory = $false)]
-        [switch] $Full
+        [Switch] $Full
     )
 
-    if ($Full) {
-        $Path = (Get-Item -Path $Path).FullName
+    begin {
+        if (-not (Test-Command -Name "wsl")) {
+            throw "Could not find 'wsl' command. Check if Windows Subsystem for Linux is enabled."
+        }
     }
 
-    wsl wslpath $Path.Replace("\", "\\")
+    process {
+        $Path = $Path.Replace("\", "\\")
+
+        if ($Full) {
+            wsl wslpath -a $Path
+        } else {
+            wsl wslpath $Path
+        }
+    }
 }
 
 
 function Test-Command {
+    <#
+        .SYNOPSIS
+            Determines if a command exists.
+
+        .DESCRIPTION
+            Determines if a command exists by checking if Get-Command can find it. Returns $true if command is
+            found, else $false.
+
+        .INPUTS
+            System.String
+                You can pipe command names to this function.
+        
+        .OUTPUTS
+            System.Boolean
+
+        .EXAMPLE
+            Test-Command -Name "foo"
+
+            Check if the command "foo" exists.
+
+        .LINK
+            Get-Command
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Boolean])]
     param(
-        [Parameter(Mandatory = $true)]
-        [string] $Name
+        # Command to check
+        [Parameter(Mandatory = $true, ValueFromPipeline)]
+        [String] $Name
     )
 
-    $SavedErrorActionPreference = $ErrorActionPreference
-    $ErrorActionPreference = "stop"
-    $CommandInstalled = $true
-
-    try {
-        Get-Command -Name $Name | Out-Null
-    } catch {
-        $CommandInstalled = $false
+    begin {
+        $ErrorActionPreference = "Stop"
     }
-
-    $ErrorActionPreference = $SavedErrorActionPreference
-    $CommandInstalled
+    
+    process {
+        try {
+            -not ($null -eq (Get-Command -Name $Name))
+        } catch {
+            $false
+        }
+    }
 }
 
 
@@ -635,11 +713,11 @@ function Set-Wallpaper {
     #>
      
     param (
-        [parameter(Mandatory=$True)]
+        [parameter(Mandatory=$true)]
         # Provide path to image
         [string] $Image,
         # Provide wallpaper style that you would like applied
-        [parameter(Mandatory=$False)]
+        [parameter(Mandatory=$false)]
         [ValidateSet('Fill', 'Fit', 'Stretch', 'Tile', 'Center', 'Span')]
         [string] $Style
     )
