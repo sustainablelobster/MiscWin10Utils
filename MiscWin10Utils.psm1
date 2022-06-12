@@ -155,9 +155,29 @@ function Test-EdgeExtensionUrl {
 
 
 function Test-Url {
+    <#
+        .SYNOPSIS
+            Determines whether a URL is reachable.
+
+        .DESCRIPTION
+            Determines whether a URL is reachable by attempting an HTTP HEAD request. Returns $True if the request
+            is successful, else $False.
+
+        .INPUTS
+            System.String
+                You can pipe URLs to this function.
+        
+        .OUTPUTS
+            System.Boolean
+
+        .EXAMPLE
+            Test-Url -Url "https://zombo.com"
+    #>
+
     [CmdletBinding()]
     [OutputType([Boolean])]
     param(
+        # URL to test
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [AllowEmptyString()]
         [String] $Url
@@ -186,15 +206,56 @@ function Test-Url {
 
 
 function Install-VSCodeExtension {
-    [CmdletBinding()]
+    <#
+        .SYNOPSIS
+            Installs the given Visual Studio Code extension.
 
+        .DESCRIPTION
+            Installs the given Visual Studio Code extension from either extension ID or path to a local .vsix file.
+
+        .INPUTS
+            System.String
+                You can pipe extension IDs or .vsix paths to this function.
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Install-VSCodeExtension -Extension "ms-python.python"
+
+            Download and install the "Python" extension by Microsoft.
+
+        .EXAMPLE
+            Install-VSCodeExtension -Extension ".\ms-python.python-2022.9.11611009.vsix"
+
+            Install the "Python" extension by Microsoft from a local .vsix file.
+
+        .LINK
+            https://marketplace.visualstudio.com/vscode
+            https://code.visualstudio.com/
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param(
+        # Extension ID or path to local .vsix file
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [string] $Extension
     )
 
+    begin {
+        if (-not (Test-Command -Name "code")) {
+            throw "Could not find 'code' command. Check if Visual Studio Code is installed."
+        }
+
+        $ErrorRecordType = [System.Management.Automation.ErrorRecord]
+    }
+
     process {
-        code --install-extension $Extension
+        $CodeOutput = code --install-extension $Extension 2>&1
+        if ($CodeOutput[1].GetType() -eq $ErrorRecordType -and $CodeOutput[1] -match "not found") {
+            Write-Error $CodeOutput[1]
+        } 
     }
 }
 
