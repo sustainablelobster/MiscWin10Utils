@@ -367,7 +367,7 @@ function Test-Command {
     
     process {
         try {
-            -not ($null -eq (Get-Command -Name $Name))
+            $null -ne (Get-Command -Name $Name)
         } catch {
             $false
         }
@@ -376,7 +376,43 @@ function Test-Command {
 
 
 function Test-Virtualization {
-    (Get-CimInstance -ClassName "win32_processor").VirtualizationFirmwareEnabled
+    <#
+        .SYNOPSIS
+            Determines if system supports virtualization.
+
+        .DESCRIPTION
+            Determines if system supports virtualization by checking if virtualization is enabled in firmware or
+            if Hyper-V's "vmcompute" service is enabled.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            System.Boolean
+
+        .EXAMPLE
+            Test-Virtualization
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Boolean])]
+    param()
+
+    begin {
+        $ErrorActionPreference = "Stop"
+    }
+
+    process {
+        $VirtFWEnabled = (Get-CimInstance -ClassName "win32_processor").VirtualizationFirmwareEnabled
+
+        try {
+            $VMComputeFound = $null -ne (Get-Service -Name "vmcompute")
+        } catch {
+            $VMComputeFound = $false
+        }
+
+        $VirtFWEnabled -or $VMComputeFound
+    }
 }
 
 
