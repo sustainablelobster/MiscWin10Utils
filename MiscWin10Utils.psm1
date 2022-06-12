@@ -571,7 +571,33 @@ function Set-ExplorerQuickAccess {
 
 
 function Restart-Explorer {
-    Stop-Process -Name "explorer"
+        <#
+        .SYNOPSIS
+            Restarts explorer.exe.
+
+        .DESCRIPTION
+            Restarts explorer.exe.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Restart-Explorer
+
+        .LINK
+            Stop-Process
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param()
+
+    process {
+        Stop-Process -Name "explorer"
+    }
 }
 
 
