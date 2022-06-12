@@ -571,7 +571,7 @@ function Set-ExplorerQuickAccess {
 
 
 function Restart-Explorer {
-        <#
+    <#
         .SYNOPSIS
             Restarts explorer.exe.
 
