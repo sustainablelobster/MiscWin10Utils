@@ -26,7 +26,7 @@ function Install-Boxstarter {
 
     [CmdletBinding()]
     [OutputType([Void])]
-    param()
+    param ()
 
     process {
         $SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
@@ -73,7 +73,7 @@ function Install-EdgeExtension {
 
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # URL of the extension's Edge Add-ons page or Chrome Web Store page.
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [ValidateScript({ Test-EdgeExtensionUrl -Url $_ })]
@@ -135,7 +135,7 @@ function Test-EdgeExtensionUrl {
 
     [CmdletBinding()]
     [OutputType([Boolean])]
-    param(
+    param (
         # URL to test
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [AllowEmptyString()]
@@ -176,7 +176,7 @@ function Test-Url {
 
     [CmdletBinding()]
     [OutputType([Boolean])]
-    param(
+    param (
         # URL to test
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [AllowEmptyString()]
@@ -239,7 +239,7 @@ function Install-VSCodeExtension {
 
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # Extension ID or path to local .vsix file
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [string] $Extension
@@ -301,7 +301,7 @@ function ConvertTo-WSLPath {
 
     [CmdletBinding()]
     [OutputType([String])]
-    param(
+    param (
         # Windows path to convert
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [String] $Path,
@@ -355,7 +355,7 @@ function Test-Command {
 
     [CmdletBinding()]
     [OutputType([Boolean])]
-    param(
+    param (
         # Command to check
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [String] $Name
@@ -396,7 +396,7 @@ function Test-Virtualization {
 
     [CmdletBinding()]
     [OutputType([Boolean])]
-    param()
+    param ()
 
     begin {
         $ErrorActionPreference = "Stop"
@@ -417,7 +417,7 @@ function Test-Virtualization {
 
 
 # function Enable-WindowsFeaturesFromJson {
-#     param(
+#     param (
 #         [Parameter(Mandatory = $true)]
 #         [string] $Json,
 #         [Parameter(Mandatory = $false)]
@@ -464,7 +464,7 @@ function Enable-ExplorerQuickAccess {
 
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
         [Switch]
@@ -500,7 +500,7 @@ function Disable-ExplorerQuickAccess {
     
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
         [Switch]
@@ -541,7 +541,7 @@ function Set-ExplorerQuickAccess {
 
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # HubMode value: 0 to enable Quick Access, 1 to disable
         [Parameter(Mandatory = $true)]
         [ValidateRange(0, 1)]
@@ -593,7 +593,7 @@ function Restart-Explorer {
 
     [CmdletBinding()]
     [OutputType([Void])]
-    param()
+    param ()
 
     process {
         Stop-Process -Name "explorer"
@@ -623,7 +623,7 @@ function Enable-CortanaButton {
     
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
         [Switch]
@@ -658,7 +658,7 @@ function Disable-CortanaButton {
     
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
         [Switch]
@@ -699,7 +699,7 @@ function Set-CortanaButton {
 
     [CmdletBinding()]
     [OutputType([Void])]
-    param(
+    param (
         # ShowCortanaButton value: 1 to enable, 0 to disable
         [Parameter(Mandatory = $true)]
         [ValidateRange(0, 1)]
@@ -723,36 +723,73 @@ function Set-CortanaButton {
 
 
 function Set-TaskbarSearch {
-    param(
+    <#
+        .SYNOPSIS
+            Change the appearance of the Taskbar Search feature.
+
+        .DESCRIPTION
+            Change the appearance of the Taskbar Search feature to:
+                "Hidden" - Disable search bar/icon
+                "Icon" - Show search icon on Taskbar
+                "Bar" - Show search bar on Taskbar
+
+            Changes may not take effect until explorer.exe is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-TaskbarSearch -Mode "Hidden" -Restart
+
+            Hide search and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-TaskbarSearch -Mode "Icon" -Restart
+
+            Show search icon on Taskbar and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-TaskbarSearch -Mode "Bar"
+
+            Show search bar on Taskbar. Changes may not take effect until explorer.exe is restarted.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Taskbar Search mode: Hidden, Icon, or Bar
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("Hidden", "Icon", "Bar")]
+        [String]
+        $Mode,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $ShowBar = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $ShowIcon = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $Disable,
-        [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer
+        [Switch]
+        $RestartExplorer
     )
 
-    $SearchKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search"
-
-    $TaskbarModeValue = 2
-    if ($Disable) {
-        $TaskbarModeValue = 0
-    } elseif ($ShowIcon) {
-        $TaskbarModeValue = 1
-    }
-
-    Set-ItemProperty -Path $SearchKey -Name "SearchboxTaskbarMode" -Value $TaskbarModeValue -Force
-
-    if ($RestartExplorer) {
-        Restart-Explorer
+    process {
+        $Value = switch ($Mode) {
+            "Hidden" { 0 }
+            "Icon" { 1 }
+            Default { 2 }   # Bar
+        }
+    
+        $SearchKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search"
+        Set-ItemProperty -Path $SearchKey -Name "SearchboxTaskbarMode" -Value $Value -Force
+    
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
     }
 }
 
 
 function Set-NewsAndInterests {
-    param(
+    param (
         [Parameter(Mandatory = $false)]
         [switch] $ShowIconAndText = $false,
         [Parameter(Mandatory = $false)]
@@ -781,7 +818,7 @@ function Set-NewsAndInterests {
 
 
 function Set-InkWorkspaceButton {
-    param(
+    param (
         [Parameter(Mandatory = $false)]
         [switch] $Enable = $false,
         [Parameter(Mandatory = $false)]
@@ -807,7 +844,7 @@ function Set-InkWorkspaceButton {
 
 
 function Set-WallpaperQuality {
-    param(
+    param (
         [Parameter(Mandatory = $true)]
         [int] $Quality,
         [Parameter(Mandatory = $false)]
@@ -831,7 +868,7 @@ function Set-WallpaperQuality {
 
 
 function Set-AutoAccentColor {
-    param(
+    param (
         [Parameter(Mandatory = $false)]
         [switch] $Enable = $false,
         [Parameter(Mandatory = $false)]
@@ -856,7 +893,7 @@ function Set-AutoAccentColor {
 
 
 function Set-ColorSettings {
-    param(
+    param (
         [Parameter(Mandatory = $false)]
         [switch] $EnableAppLightTheme = $false,
         [Parameter(Mandatory = $false)]
@@ -992,7 +1029,7 @@ function Set-Wallpaper {
 
 
 function Set-DesktopRecycleBin {
-    param(
+    param (
         [Parameter(Mandatory = $false)]
         [switch] $Enable = $false,
         [Parameter(Mandatory = $false)]
@@ -1017,7 +1054,7 @@ function Set-DesktopRecycleBin {
 
 
 function New-ThisPCFolder {
-    param(
+    param (
         [Parameter(Mandatory = $true)]
         [string] $Name,
         [Parameter(Mandatory = $true)]
