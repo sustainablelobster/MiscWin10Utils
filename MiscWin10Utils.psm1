@@ -457,7 +457,7 @@ function Enable-ExplorerQuickAccess {
             None
 
         .EXAMPLE
-            Enable-ExplorerQuickAccess -Restart
+            Enable-ExplorerQuickAccess -RestartExplorer
 
             Enable Quick Access and restart explorer.exe so changes take effect immediately.
     #>
@@ -493,7 +493,7 @@ function Disable-ExplorerQuickAccess {
             None
 
         .EXAMPLE
-            Disable-ExplorerQuickAccess -Restart
+            Disable-ExplorerQuickAccess -RestartExplorer
 
             Disable Quick Access and restart explorer.exe so changes take effect immediately.
     #>
@@ -616,7 +616,7 @@ function Enable-CortanaButton {
             None
 
         .EXAMPLE
-            Enable-CortanaButton -Restart
+            Enable-CortanaButton -RestartExplorer
 
             Enable Cortana button and restart explorer.exe so changes take effect immediately.
     #>
@@ -651,7 +651,7 @@ function Disable-CortanaButton {
             None
 
         .EXAMPLE
-            Disable-CortanaButton -Restart
+            Disable-CortanaButton -RestartExplorer
 
             Disable Cortana button and restart explorer.exe so changes take effect immediately.
     #>
@@ -687,7 +687,7 @@ function Set-CortanaButton {
             None
 
         .EXAMPLE
-            Set-CortanaButton -Value 1 -Restart
+            Set-CortanaButton -Value 1 -RestartExplorer
 
             Enable Cortana button and restart explorer.exe so changes take effect immediately.
 
@@ -742,12 +742,12 @@ function Set-TaskbarSearch {
             None
 
         .EXAMPLE
-            Set-TaskbarSearch -Mode "Hidden" -Restart
+            Set-TaskbarSearch -Mode "Hidden" -RestartExplorer
 
             Hide search and restart explorer.exe so changes take effect immediately.
 
         .EXAMPLE
-            Set-TaskbarSearch -Mode "Icon" -Restart
+            Set-TaskbarSearch -Mode "Icon" -RestartExplorer
 
             Show search icon on Taskbar and restart explorer.exe so changes take effect immediately.
 
@@ -808,12 +808,12 @@ function Set-NewsAndInterests {
             None
 
         .EXAMPLE
-            Set-NewsAndInterests -Mode "IconAndText" -Restart
+            Set-NewsAndInterests -Mode "IconAndText" -RestartExplorer
 
             Show "News and Interests" icon and text and restart explorer.exe so changes take effect immediately.
 
         .EXAMPLE
-            Set-NewsAndInterests -Mode "Icon" -Restart
+            Set-NewsAndInterests -Mode "Icon" -RestartExplorer
 
             Show "News and Interests" icon and restart explorer.exe so changes take effect immediately.
 
@@ -1029,27 +1029,128 @@ function Set-WallpaperQuality {
 }
 
 
-function Set-AutoAccentColor {
+function Enable-AutoAccentColor {
+    <#
+        .SYNOPSIS
+            Let Windows pick UI accent color automatically.
+
+        .DESCRIPTION
+            Let Windows pick UI accent color automatically based on your wallpaper. Changes may not take effect
+            until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-AutoAccentColor -RestartExplorer
+
+            Enable automatic accents and restart explorer.exe so changes take effect immediately.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param (
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $Enable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $Disable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer
+        [Switch]
+        $RestartExplorer
     )
 
-    $DesktopKey = "HKCU:\Control Panel\Desktop"
-
-    $AutoColorizationValue = 0
-    if ($Enable) {
-        $AutoColorizationValue = 1
+    process {
+        Set-AutoAccentColor -Value 1 -RestartExplorer:$RestartExplorer
     }
+}
 
-    Set-ItemProperty -Path $DesktopKey -Name "AutoColorization" -Value $AutoColorizationValue -Force
 
-    if ($RestartExplorer) {
-        Restart-Explorer
+function Disable-AutoAccentColor {
+    <#
+        .SYNOPSIS
+            Disables automatic selection of UI accent color.
+
+        .DESCRIPTION
+            Prevents Windows from picking UI accent color automatically based on your wallpaper. Changes may not
+            take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Disable-AutoAccentColor -RestartExplorer
+
+            Disable automatic accents and restart explorer.exe so changes take effect immediately.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-AutoAccentColor -Value 0 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Set-AutoAccentColor {
+    <#
+        .SYNOPSIS
+            Enable or disables automatic selection of UI accent color.
+
+        .DESCRIPTION
+            Allow or prevent Windows from picking UI accent color automatically based on your wallpaper. 
+                Value = 0 to disable
+                Value = 1 to enable
+
+            Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-AutoAccentColor -Value 0 -RestartExplorer
+
+            Disable automatic accents and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-AutoAccentColor -Value 1
+
+            Enable automatic accents. Changes may not take effect until explorer.exe is restarted.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # 0 to disable, 1 to enable
+        [Parameter(Mandatory = $true)]
+        [ValidateRange(0, 1)]
+        [Int]
+        $Value,
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        $DesktopKey = "HKCU:\Control Panel\Desktop"
+        Set-ItemProperty -Path $DesktopKey -Name "AutoColorization" -Value $Value -Force
+
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
     }
 }
 
