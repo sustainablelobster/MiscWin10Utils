@@ -514,7 +514,7 @@ function Disable-ExplorerQuickAccess {
 
 
 function Set-ExplorerQuickAccess {
-        <#
+    <#
         .SYNOPSIS
             Enables or disables the Quick Access menu in Explorer system-wide.
 
@@ -536,7 +536,7 @@ function Set-ExplorerQuickAccess {
         .EXAMPLE
             Set-ExplorerQuickAccess -Value 0
 
-            Enable Quick Access. Changes will not take effect until explorer.exe is restarted.
+            Enable Quick Access. Changes may not take effect until explorer.exe is restarted.
     #>
 
     [CmdletBinding()]
@@ -601,61 +601,123 @@ function Restart-Explorer {
 }
 
 
-function New-ThisPCFolder {
+function Enable-CortanaButton {
+    <#
+        .SYNOPSIS
+            Enables Cortana button on Taskbar.
+
+        .DESCRIPTION
+            Enables the Cortana button on the Taskbar. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-CortanaButton -Restart
+
+            Enable Cortana button and restart explorer.exe so changes take effect immediately.
+    #>
+    
+    [CmdletBinding()]
+    [OutputType([Void])]
     param(
-        [Parameter(Mandatory = $true)]
-        [string] $Name,
-        [Parameter(Mandatory = $true)]
-        [string] $Path,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [string] $Infotip = "",
-        [Parameter(Mandatory = $false)]
-        [string] $Icon = "$env:SystemRoot\system32\shell32.dll,3"
+        [Switch]
+        $RestartExplorer
     )
 
-    $Guid = (New-Guid).Guid
-    $TemplateKey = "HKLM:\SOFTWARE\Classes\CLSID\{f86fa3ab-70d2-4fc7-9c99-fcbf05467f3a}" # Videos
-    $CLSIDKey = "HKCU:\SOFTWARE\Classes\CLSID\{$Guid}"
-    $NamespaceKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{$GUID}"
-    $InstanceCLSID = "{0AFACED1-E828-11D1-9187-B532F1E9575D}" # Folder shortcut
+    process {
+        Set-CortanaButton -Value 1 -RestartExplorer:$RestartExplorer
+    }
+}
 
-    Copy-Item -Path $TemplateKey -Destination $CLSIDKey -Recurse -Force
-    Set-ItemProperty -Path $CLSIDKey -Name "(Default)" -Value $Name -Force
-    Set-ItemProperty -Path $CLSIDKey -Name "Infotip" -Value $Infotip -Force
-    Set-ItemProperty -Path $CLSIDKey -Name "CreatedBy" -Value "MyWin10" -Force
-    Set-ItemProperty -Path "$CLSIDKey\DefaultIcon" -Name "(Default)" -Value $Icon -Force
-    Set-ItemProperty -Path "$CLSIDKey\Instance" -Name "CLSID" -Value $InstanceCLSID -Force
-    Set-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "Target" -Value $Path -Type ExpandString `
-            -Force
-    Set-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "Attributes" -Value 0x15 -Force
-    Remove-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "TargetKnownFolder" -Force
-    Remove-ItemProperty -Path "$CLSIDKey\ShellFolder" -Name "FolderValueFlags" -Force
-    Remove-ItemProperty -Path "$CLSIDKey\ShellFolder" -Name "SortOrderIndex" -Force
-    New-Item -Path $NamespaceKey -Force
+
+function Disable-CortanaButton {
+    <#
+        .SYNOPSIS
+            Disables Cortana button on Taskbar.
+
+        .DESCRIPTION
+            Disables the Cortana button on the Taskbar. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Disable-CortanaButton -Restart
+
+            Disable Cortana button and restart explorer.exe so changes take effect immediately.
+    #>
+    
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param(
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-CortanaButton -Value 0 -RestartExplorer:$RestartExplorer
+    }
 }
 
 
 function Set-CortanaButton {
+    <#
+        .SYNOPSIS
+            Enables or disables Cortana button on Taskbar.
+
+        .DESCRIPTION
+            Enables or disabels the Cortana button on the Taskbar. Changes may not take effect until Explorer is 
+            restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-CortanaButton -Value 1 -Restart
+
+            Enable Cortana button and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-CortanaButton -Value 0
+
+            Disable Cortana button. Changes may not take effect until explorer.exe is restarted.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param(
+        # ShowCortanaButton value: 1 to enable, 0 to disable
+        [Parameter(Mandatory = $true)]
+        [ValidateRange(0, 1)]
+        [Int] 
+        $Value,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $Enable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $Disable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer
+        [switch] 
+        $RestartExplorer
     )
 
-    $ExplorerAdvancedKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+    process {
+        $ExplorerAdvancedKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+        Set-ItemProperty -Path $ExplorerAdvancedKey -Name "ShowCortanaButton" -Value $Value -Force
 
-    $ShowCortanaButtonValue = 1
-    if ($Disable) {
-        $ShowCortanaButtonValue = 0
-    }
-
-    Set-ItemProperty -Path $ExplorerAdvancedKey -Name "ShowCortanaButton" -Value $ShowCortanaButtonValue -Force
-
-    if ($RestartExplorer) {
-        Restart-Explorer
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
     }
 }
 
@@ -951,4 +1013,38 @@ function Set-DesktopRecycleBin {
     if ($RestartExplorer) {
         Restart-Explorer
     }
+}
+
+
+function New-ThisPCFolder {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string] $Name,
+        [Parameter(Mandatory = $true)]
+        [string] $Path,
+        [Parameter(Mandatory = $false)]
+        [string] $Infotip = "",
+        [Parameter(Mandatory = $false)]
+        [string] $Icon = "$env:SystemRoot\system32\shell32.dll,3"
+    )
+
+    $Guid = (New-Guid).Guid
+    $TemplateKey = "HKLM:\SOFTWARE\Classes\CLSID\{f86fa3ab-70d2-4fc7-9c99-fcbf05467f3a}" # Videos
+    $CLSIDKey = "HKCU:\SOFTWARE\Classes\CLSID\{$Guid}"
+    $NamespaceKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{$GUID}"
+    $InstanceCLSID = "{0AFACED1-E828-11D1-9187-B532F1E9575D}" # Folder shortcut GUID
+
+    Copy-Item -Path $TemplateKey -Destination $CLSIDKey -Recurse -Force
+    Set-ItemProperty -Path $CLSIDKey -Name "(Default)" -Value $Name -Force
+    Set-ItemProperty -Path $CLSIDKey -Name "Infotip" -Value $Infotip -Force
+    Set-ItemProperty -Path $CLSIDKey -Name "CreatedBy" -Value "MiscWin10Utils" -Force
+    Set-ItemProperty -Path "$CLSIDKey\DefaultIcon" -Name "(Default)" -Value $Icon -Force
+    Set-ItemProperty -Path "$CLSIDKey\Instance" -Name "CLSID" -Value $InstanceCLSID -Force
+    Set-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "Target" -Value $Path -Type ExpandString `
+            -Force
+    Set-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "Attributes" -Value 0x15 -Force
+    Remove-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "TargetKnownFolder" -Force
+    Remove-ItemProperty -Path "$CLSIDKey\ShellFolder" -Name "FolderValueFlags" -Force
+    Remove-ItemProperty -Path "$CLSIDKey\ShellFolder" -Name "SortOrderIndex" -Force
+    New-Item -Path $NamespaceKey -Force
 }
