@@ -416,31 +416,6 @@ function Test-Virtualization {
 }
 
 
-# function Enable-WindowsFeaturesFromJson {
-#     param (
-#         [Parameter(Mandatory = $true)]
-#         [string] $Json,
-#         [Parameter(Mandatory = $false)]
-#         [switch] $Restart = $false
-#     )
-
-#     $Features = (Get-Content -Path $Json | ConvertFrom-Json)
-#     $VirtualizationEnabled = Test-Virtualization
-
-#     foreach ($Feature in $Features) {
-#         if ($Feature.requiresVirtualization -and -not $VirtualizationEnabled) {
-#             continue
-#         }
-
-#         Enable-WindowsOptionalFeature -FeatureName $Feature.name -Online -All -NoRestart
-#     }
-
-#     if ($Restart) {
-#         Restart-Computer -Force
-#     }
-# }
-
-
 function Enable-ExplorerQuickAccess {
     <#
         .SYNOPSIS
@@ -460,6 +435,9 @@ function Enable-ExplorerQuickAccess {
             Enable-ExplorerQuickAccess -RestartExplorer
 
             Enable Quick Access and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Disable-ExplorerQuickAccess
     #>
 
     [CmdletBinding()]
@@ -496,6 +474,9 @@ function Disable-ExplorerQuickAccess {
             Disable-ExplorerQuickAccess -RestartExplorer
 
             Disable Quick Access and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-ExplorerQuickAccess
     #>
     
     [CmdletBinding()]
@@ -522,6 +503,8 @@ function Set-ExplorerQuickAccess {
             Enables or disables the Quick Access menu in Explorer system-wide. Changes may not take effect until 
             Explorer is restarted. Must be run as Administrator.
 
+            Not intended to be used directly; use the functions in the related links instead.
+
         .INPUTS
             None
         
@@ -537,6 +520,10 @@ function Set-ExplorerQuickAccess {
             Set-ExplorerQuickAccess -Value 0
 
             Enable Quick Access. Changes may not take effect until explorer.exe is restarted.
+
+        .LINK
+            Enable-ExplorerQuickAccess
+            Disable-ExplorerQuickAccess
     #>
 
     [CmdletBinding()]
@@ -619,6 +606,9 @@ function Enable-CortanaButton {
             Enable-CortanaButton -RestartExplorer
 
             Enable Cortana button and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Disable-CortanaButton
     #>
     
     [CmdletBinding()]
@@ -654,6 +644,9 @@ function Disable-CortanaButton {
             Disable-CortanaButton -RestartExplorer
 
             Disable Cortana button and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-CortanaButton
     #>
     
     [CmdletBinding()]
@@ -680,6 +673,8 @@ function Set-CortanaButton {
             Enables or disabels the Cortana button on the Taskbar. Changes may not take effect until Explorer is 
             restarted.
 
+            Not intended to be used directly; use the functions in the related links instead.
+
         .INPUTS
             None
         
@@ -695,6 +690,10 @@ function Set-CortanaButton {
             Set-CortanaButton -Value 0
 
             Disable Cortana button. Changes may not take effect until explorer.exe is restarted.
+
+        .LINK
+            Enable-CortanaButton
+            Disable-CortanaButton
     #>
 
     [CmdletBinding()]
@@ -875,6 +874,9 @@ function Enable-InkWorkspaceButton {
             Enable-InkWorkspaceButton -RestartExplorer
 
             Show Ink Workspace button and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Disable-InkWorkspaceButton
     #>
 
     [CmdletBinding()]
@@ -910,6 +912,9 @@ function Disable-InkWorkspaceButton {
             Disable-InkWorkspaceButton -RestartExplorer
 
             Hide Ink Workspace button and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-InkWorkspaceButton
     #>
 
     [CmdletBinding()]
@@ -939,6 +944,8 @@ function Set-InkWorkspaceButton {
                 
             Changes may not take effect until Explorer is restarted.
 
+            Not intended to be used directly; use the functions in the related links instead.
+
         .INPUTS
             None
         
@@ -954,6 +961,10 @@ function Set-InkWorkspaceButton {
             Set-InkWorkspaceButton -Value 1
 
             Show Ink Workspace button. Changes may not take effect until explorer.exe is restarted.
+
+        .LINK
+            Enable-InkWorkspaceButton
+            Disable-InkWorkspaceButton
     #>
 
     [CmdletBinding()]
@@ -1048,6 +1059,9 @@ function Enable-AutoAccentColor {
             Enable-AutoAccentColor -RestartExplorer
 
             Enable automatic accents and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Disable-AutoAccentColor
     #>
 
     [CmdletBinding()]
@@ -1084,6 +1098,9 @@ function Disable-AutoAccentColor {
             Disable-AutoAccentColor -RestartExplorer
 
             Disable automatic accents and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-AutoAccentColor
     #>
 
     [CmdletBinding()]
@@ -1113,21 +1130,17 @@ function Set-AutoAccentColor {
 
             Changes may not take effect until Explorer is restarted.
 
+            Not intended to be used directly; use the functions in the related links instead.
+
         .INPUTS
             None
         
         .OUTPUTS
             None
 
-        .EXAMPLE
-            Set-AutoAccentColor -Value 0 -RestartExplorer
-
-            Disable automatic accents and restart explorer.exe so changes take effect immediately.
-
-        .EXAMPLE
-            Set-AutoAccentColor -Value 1
-
-            Enable automatic accents. Changes may not take effect until explorer.exe is restarted.
+        .LINK
+            Enable-AutoAccentColor
+            Disable-AutoAccentColor
     #>
 
     [CmdletBinding()]
@@ -1173,6 +1186,11 @@ function Enable-AppLightTheme {
             Enable-AppLightTheme -RestartExplorer
 
             Set app theme to light mode and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-AppDarkTheme
+            Enable-SystemLightTheme
+            Enable-SystemDarkTheme
     #>
 
     [CmdletBinding()]
@@ -1185,7 +1203,7 @@ function Enable-AppLightTheme {
     )
 
     process {
-        Set-AppTheme -Value 1 -RestartExplorer:$RestartExplorer
+        Set-PersonlizeKeyValue -Name "AppsUseLightTheme" -Value 1 -RestartExplorer:$RestartExplorer
     }
 }
 
@@ -1208,6 +1226,11 @@ function Enable-AppDarkTheme {
             Enable-AppDarkTheme -RestartExplorer
 
             Set app theme to dark mode and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-AppLightTheme
+            Enable-SystemLightTheme
+            Enable-SystemDarkTheme
     #>
 
     [CmdletBinding()]
@@ -1220,22 +1243,18 @@ function Enable-AppDarkTheme {
     )
 
     process {
-        Set-AppTheme -Value 0 -RestartExplorer:$RestartExplorer
+        Set-PersonlizeKeyValue -Name "AppsUseLightTheme" -Value 0 -RestartExplorer:$RestartExplorer
     }
 }
 
 
-function Set-AppTheme {
+function Enable-SystemLightTheme {
     <#
         .SYNOPSIS
-            Set application theme.
+            Set system theme to light mode.
 
         .DESCRIPTION
-            Set application theme to dark or light mode.
-                Value = 0 for dark mode
-                Value = 1 for light mode
-            
-            Changes may not take effect until Explorer is restarted.
+            Set system theme to light mode. Changes may not take effect until Explorer is restarted.
 
         .INPUTS
             None
@@ -1244,23 +1263,182 @@ function Set-AppTheme {
             None
 
         .EXAMPLE
-            Set-AppTheme -Value 0 -RestartExplorer
+            Enable-SystemLightTheme -RestartExplorer
 
-            Set app theme to dark mode and restart explorer.exe so changes take effect immediately.
+            Set system theme to light mode and restart explorer.exe so changes take effect immediately.
 
-        .EXAMPLE
-            Set-AppTheme -Value 1
-
-            Set app theme to light mode. Changes may not take effect until explorer.exe is restarted.
+        .LINK
+            Enable-SystemDarkTheme
+            Enable-AppLightTheme
+            Enable-AppDarkTheme
     #>
 
     [CmdletBinding()]
     [OutputType([Void])]
     param (
-        # 0 for dark theme, 1 for light theme
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-PersonlizeKeyValue -Name "SystemUsesLightTheme" -Value 1 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Enable-SystemDarkTheme {
+    <#
+        .SYNOPSIS
+            Set system theme to dark mode.
+
+        .DESCRIPTION
+            Set system theme to dark mode. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-SystemDarkTheme -RestartExplorer
+
+            Set system theme to dark mode and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-SystemLightTheme
+            Enable-AppLightTheme
+            Enable-AppDarkTheme
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-PersonlizeKeyValue -Name "SystemUsesLightTheme" -Value 0 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Enable-TransparencyEffects {
+    <#
+        .SYNOPSIS
+            Enable system UI transparency effects.
+
+        .DESCRIPTION
+            Enable system UI transparency effects. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-TransparencyEffects -RestartExplorer
+
+            Enable system UI transparency effects and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Disable-TransparencyEffects
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-PersonlizeKeyValue -Name "EnableTransparency" -Value 1 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Disable-TransparencyEffects {
+    <#
+        .SYNOPSIS
+            Disable system UI transparency effects.
+
+        .DESCRIPTION
+            Disable system UI transparency effects. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Disable-TransparencyEffects -RestartExplorer
+
+            Disable system UI transparency effects and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-TransparencyEffects
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-PersonlizeKeyValue -Name "EnableTransparency" -Value 0 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Set-PersonlizeKeyValue {
+    <#
+        .SYNOPSIS
+            Changes Personlization settings via Registry.
+
+        .DESCRIPTION
+            Changes Personlization settings by modifying values of the Registry key 
+            "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize".
+
+            Not intended to be used directly; use the functions in the related links instead.
+
+        .INPUTS
+            None
+
+        .OUTPUTS
+            None
+
+        .LINK
+            Enable-AppLightTheme
+            Enable-AppDarkTheme
+            Enable-SystemLightTheme
+            Enable-SystemDarkTheme
+            Enable-TransparencyEffects
+            Disable-TransparencyEffects
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Name of value
         [Parameter(Mandatory = $true)]
-        [ValidateRange(0, 1)]
-        [Int]
+        [String]
+        $Name,
+        # Value data
+        [Parameter(Mandatory = $true)]
         $Value,
         # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
@@ -1270,75 +1448,11 @@ function Set-AppTheme {
 
     process {
         $PersonalizeKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-        Set-ItemProperty -Path $PersonalizeKey -Name "AppsUseLightTheme" -Value $Value -Force
+        Set-ItemProperty -Path $PersonalizeKey -Name $Name -Value $Value -Force
 
         if ($RestartExplorer) {
             Restart-Explorer
         }
-    }
-}
-
-
-function Set-ColorSettings {
-    param (
-        [Parameter(Mandatory = $false)]
-        [switch] $EnableAppLightTheme = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $EnableAppDarkTheme = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $EnableSystemLightTheme = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $EnableSystemDarkTheme = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $EnableTransparancyEffects = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $DisableTransparancyEffects = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $EnableAutoAccentColor = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $DisableAutoAccentColor = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer = $false
-    )
-
-    $PersonalizeKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
-
-    if ($EnableAppLightTheme) {
-        Set-ItemProperty -Path $PersonalizeKey -Name "AppsUseLightTheme" -Value 1 -Force
-    } elseif ($EnableAppDarkTheme) {
-        Set-ItemProperty -Path $PersonalizeKey -Name "AppsUseLightTheme" -Value 0 -Force
-    }
-
-    if ($EnableSystemLightTheme) {
-        Set-ItemProperty -Path $PersonalizeKey -Name "SystemUsesLightTheme" -Value 1 -Force
-    } elseif ($EnableSystemDarkTheme) {
-        Set-ItemProperty -Path $PersonalizeKey -Name "SystemUsesLightTheme" -Value 0 -Force
-    }
-
-    if ($EnableTransparancyEffects) {
-        Set-ItemProperty -Path $PersonalizeKey -Name "EnableTransparancy" -Value 1 -Force
-    } elseif ($DisableTransparancyEffects) {
-        Set-ItemProperty -Path $PersonalizeKey -Name "EnableTransparancy" -Value 0 -Force
-    }
-
-    if ($EnableAutoAccentColor) {
-        Set-AutoAccentColor -Enable
-    } elseif ($DisableAutoAccentColor) {
-        Set-AutoAccentColor -Disable
-    }
-
-    if ($RestartExplorer) {
-        Restart-Explorer
-    }
-}
-
-
-function Test-Ubuntu {
-    if (-not (Test-Command -Name "ubuntu")) {
-        $false
-    } else {
-        ubuntu run cat /dev/null
-        $?
     }
 }
 
@@ -1356,119 +1470,195 @@ function Set-Wallpaper {
 
         .EXAMPLE
             Set-Wallpaper -Image "C:\Wallpaper\Default.jpg"
+
+        .EXAMPLE
             Set-Wallpaper -Image "C:\Wallpaper\Background.jpg" -Style Fit
 
         .NOTES
             Author: Jose Espitia
             Date: 2020-08-11
-            Page: https://www.joseespitia.com/2017/09/15/set-wallpaper-powershell-function/
+
+        .LINK
+            https://www.joseespitia.com/2017/09/15/set-wallpaper-powershell-function/
     #>
-     
+    
+    [CmdletBinding()]
+    [OutputType([Void])]
     param (
-        [parameter(Mandatory=$true)]
         # Provide path to image
-        [string] $Image,
+        [parameter(Mandatory=$true)]
+        [ValidateScript({ Test-Path -Path $_ })]
+        [String]
+        $Image,
         # Provide wallpaper style that you would like applied
         [parameter(Mandatory=$false)]
         [ValidateSet('Fill', 'Fit', 'Stretch', 'Tile', 'Center', 'Span')]
-        [string] $Style
+        [String] 
+        $Style
     )
      
-    $WallpaperStyle = switch ($Style) {
-        "Fill" {"10"}
-        "Fit" {"6"}
-        "Stretch" {"2"}
-        "Tile" {"0"}
-        "Center" {"0"}
-        "Span" {"22"}
-    }
-     
-    if ($Style -eq "Tile") {
-     
-        New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String `
-                -Value $WallpaperStyle -Force
-        New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 1 `
-                -Force
-     
-    } else {
-        New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String `
-                -Value $WallpaperStyle -Force
-        New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 0 `
-                -Force
-    }
-     
-    Add-Type -TypeDefinition @" 
-        using System; 
-        using System.Runtime.InteropServices;        
-        public class Params { 
-            [DllImport("User32.dll",CharSet=CharSet.Unicode)] 
-            public static extern int SystemParametersInfo (Int32 uAction, Int32 uParam, String lpvParam, 
-                    Int32 fuWinIni);
+    process {
+        $WallpaperStyle = switch ($Style) {
+            "Fill" {"10"}
+            "Fit" {"6"}
+            "Stretch" {"2"}
+            "Tile" {"0"}
+            "Center" {"0"}
+            "Span" {"22"}
         }
+         
+        if ($Style -eq "Tile") {
+            New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String `
+                    -Value $WallpaperStyle -Force
+            New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 1 `
+                    -Force
+         
+        } else {
+            New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name WallpaperStyle -PropertyType String `
+                    -Value $WallpaperStyle -Force
+            New-ItemProperty -Path "HKCU:\Control Panel\Desktop" -Name TileWallpaper -PropertyType String -Value 0 `
+                    -Force
+        }
+         
+        Add-Type -TypeDefinition @" 
+using System; 
+using System.Runtime.InteropServices;        
+public class Params { 
+    [DllImport("User32.dll",CharSet=CharSet.Unicode)] 
+    public static extern int SystemParametersInfo (Int32 uAction, Int32 uParam, String lpvParam, 
+            Int32 fuWinIni);
+}
 "@ 
-      
-    $SPI_SETDESKWALLPAPER = 0x0014
-    $UpdateIniFile = 0x01
-    $SendChangeEvent = 0x02
-    $fWinIni = $UpdateIniFile -bor $SendChangeEvent
-    [Params]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $Image, $fWinIni)
+
+        $SPI_SETDESKWALLPAPER = 0x0014
+        $UpdateIniFile = 0x01
+        $SendChangeEvent = 0x02
+        $fWinIni = $UpdateIniFile -bor $SendChangeEvent
+        [Params]::SystemParametersInfo($SPI_SETDESKWALLPAPER, 0, $Image, $fWinIni)
+    }
+}
+
+
+function Enable-DesktopRecycleBin {
+    <#
+        .SYNOPSIS
+            Show Recycle Bin on Desktop.
+
+        .DESCRIPTION
+            Show Recycle Bin on Desktop. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-DesktopRecycleBin -RestartExplorer
+
+            Show Recycle Bin on Desktop and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Disable-DesktopRecycleBin
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-DesktopRecycleBin -Value 0 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Disable-DesktopRecycleBin {
+    <#
+        .SYNOPSIS
+            Hide Recycle Bin on Desktop.
+
+        .DESCRIPTION
+            Hide Recycle Bin on Desktop. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Disable-DesktopRecycleBin -RestartExplorer
+
+            Hide Recycle Bin on Desktop and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            Enable-DesktopRecycleBin
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-DesktopRecycleBin -Value 1 -RestartExplorer:$RestartExplorer
+    }
 }
 
 
 function Set-DesktopRecycleBin {
+    <#
+        .SYNOPSIS
+            Show or hide Recycle Bin on Desktop.
+
+        .DESCRIPTION
+            Show or hide Recycle Bin on Desktop.
+                Value = 0 to show
+                Value = 1 to hide
+
+            Changes may not take effect until Explorer is restarted.
+
+            Not intended to be used directly; use the functions in the related links instead.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .LINK
+            Enable-DesktopRecycleBin
+            Disable-DesktopRecycleBin
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param (
+        # 0 to show, 1 to hide
+        [Parameter(Mandatory = $true)]
+        [ValidateRange(0, 1)]
+        [Int]
+        $Value,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $Enable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $Disable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer = $false
+        [Switch]
+        $RestartExplorer
     )
 
     $NewStartPanelKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel"
     $RecycleBinGuid = "{645FF040-5081-101B-9F08-00AA002F954E}"
-
-    if ($Enable) {
-        Remove-ItemProperty -Path $NewStartPanelKey -Name $RecycleBinGuid
-    } elseif ($Disable) {
-        Set-ItemProperty -Path $NewStartPanelKey -Name $RecycleBinGuid -Value 1
-    }
+    Set-ItemProperty -Path $NewStartPanelKey -Name $RecycleBinGuid -Value $Value
 
     if ($RestartExplorer) {
         Restart-Explorer
     }
-}
-
-
-function New-ThisPCFolder {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string] $Name,
-        [Parameter(Mandatory = $true)]
-        [string] $Path,
-        [Parameter(Mandatory = $false)]
-        [string] $Infotip = "",
-        [Parameter(Mandatory = $false)]
-        [string] $Icon = "$env:SystemRoot\system32\shell32.dll,3"
-    )
-
-    $Guid = (New-Guid).Guid
-    $TemplateKey = "HKLM:\SOFTWARE\Classes\CLSID\{f86fa3ab-70d2-4fc7-9c99-fcbf05467f3a}" # Videos
-    $CLSIDKey = "HKCU:\SOFTWARE\Classes\CLSID\{$Guid}"
-    $NamespaceKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\MyComputer\NameSpace\{$GUID}"
-    $InstanceCLSID = "{0AFACED1-E828-11D1-9187-B532F1E9575D}" # Folder shortcut GUID
-
-    Copy-Item -Path $TemplateKey -Destination $CLSIDKey -Recurse -Force
-    Set-ItemProperty -Path $CLSIDKey -Name "(Default)" -Value $Name -Force
-    Set-ItemProperty -Path $CLSIDKey -Name "Infotip" -Value $Infotip -Force
-    Set-ItemProperty -Path $CLSIDKey -Name "CreatedBy" -Value "MiscWin10Utils" -Force
-    Set-ItemProperty -Path "$CLSIDKey\DefaultIcon" -Name "(Default)" -Value $Icon -Force
-    Set-ItemProperty -Path "$CLSIDKey\Instance" -Name "CLSID" -Value $InstanceCLSID -Force
-    Set-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "Target" -Value $Path -Type ExpandString `
-            -Force
-    Set-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "Attributes" -Value 0x15 -Force
-    Remove-ItemProperty -Path "$CLSIDKey\Instance\InitPropertyBag" -Name "TargetKnownFolder" -Force
-    Remove-ItemProperty -Path "$CLSIDKey\ShellFolder" -Name "FolderValueFlags" -Force
-    Remove-ItemProperty -Path "$CLSIDKey\ShellFolder" -Name "SortOrderIndex" -Force
-    New-Item -Path $NamespaceKey -Force
 }
