@@ -1155,6 +1155,130 @@ function Set-AutoAccentColor {
 }
 
 
+function Enable-AppLightTheme {
+    <#
+        .SYNOPSIS
+            Set application theme to light mode.
+
+        .DESCRIPTION
+            Set application theme to light mode. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-AppLightTheme -RestartExplorer
+
+            Set app theme to light mode and restart explorer.exe so changes take effect immediately.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-AppTheme -Value 1 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Enable-AppDarkTheme {
+    <#
+        .SYNOPSIS
+            Set application theme to dark mode.
+
+        .DESCRIPTION
+            Set application theme to dark mode. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-AppDarkTheme -RestartExplorer
+
+            Set app theme to dark mode and restart explorer.exe so changes take effect immediately.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-AppTheme -Value 0 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Set-AppTheme {
+    <#
+        .SYNOPSIS
+            Set application theme.
+
+        .DESCRIPTION
+            Set application theme to dark or light mode.
+                Value = 0 for dark mode
+                Value = 1 for light mode
+            
+            Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-AppTheme -Value 0 -RestartExplorer
+
+            Set app theme to dark mode and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-AppTheme -Value 1
+
+            Set app theme to light mode. Changes may not take effect until explorer.exe is restarted.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # 0 for dark theme, 1 for light theme
+        [Parameter(Mandatory = $true)]
+        [ValidateRange(0, 1)]
+        [Int]
+        $Value,
+        # Restart explorer.exe to allow changes to take effect
+        [Parameter(Mandatory = $false)]
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        $PersonalizeKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+        Set-ItemProperty -Path $PersonalizeKey -Name "AppsUseLightTheme" -Value $Value -Force
+
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
+    }
+}
+
+
 function Set-ColorSettings {
     param (
         [Parameter(Mandatory = $false)]
