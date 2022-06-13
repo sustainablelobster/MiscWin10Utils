@@ -956,6 +956,8 @@ function Set-InkWorkspaceButton {
             Show Ink Workspace button. Changes may not take effect until explorer.exe is restarted.
     #>
 
+    [CmdletBinding()]
+    [OutputType([Void])]
     param (
         # 1 to show Ink Workspace button, 0 to hide
         [Parameter(Mandatory = $true)]
@@ -979,25 +981,50 @@ function Set-InkWorkspaceButton {
 
 
 function Set-WallpaperQuality {
+    <#
+        .SYNOPSIS
+            Sets the quality of desktop wallpaper.
+
+        .DESCRIPTION
+            Sets the quality of desktop wallpaper anywhere from 60% to 100%. By default, Windows 10 compresses
+            wallpapers to 85% of their original quality. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-WallpaperQuality -Value 100 -RestartExplorer
+
+            Set wallpaper quality to max value and restart explorer.exe so changes take effect immediately.
+
+        .LINK
+            https://www.howtogeek.com/277808/windows-10-compresses-your-wallpaper-but-you-can-make-them-high-quality-again/
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param (
+        # Wallpaper quality (60 - 100)
         [Parameter(Mandatory = $true)]
-        [int] $Quality,
+        [ValidateRange(60, 100)]
+        [Int] 
+        $Quality,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer
+        [Switch]
+        $RestartExplorer
     )
 
-    $DesktopKey = "HKCU:\SOFTWARE\Control Panel\Desktop"
+    process {
+        $DesktopKey = "HKCU:\SOFTWARE\Control Panel\Desktop"
+        Set-ItemProperty -Path $DesktopKey -Name "JPEGImportQuality" -Value $Quality -Force
 
-    if ($Quality -lt 60) {
-        $Quality = 60
-    } elseif ($Quality -gt 100) {
-        $Quality = 100
-    }
-
-    Set-ItemProperty -Path $DesktopKey -Name "JPEGImportQuality" -Value $Quality -Force
-
-    if ($RestartExplorer) {
-        Restart-Explorer
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
     }
 }
 
