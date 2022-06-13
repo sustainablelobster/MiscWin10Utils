@@ -789,30 +789,70 @@ function Set-TaskbarSearch {
 
 
 function Set-NewsAndInterests {
+    <#
+        .SYNOPSIS
+            Change the appearance of "News and Interests" on Taskbar.
+
+        .DESCRIPTION
+            Change the appearance of "News and Interests" on the Taskbar to:
+                "IconAndText" - Show icon and text
+                "Icon" - Show icon only
+                "Off" - Disable "News and Interests"
+
+            Changes may not take effect until explorer.exe is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-NewsAndInterests -Mode "IconAndText" -Restart
+
+            Show "News and Interests" icon and text and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-NewsAndInterests -Mode "Icon" -Restart
+
+            Show "News and Interests" icon and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-NewsAndInterests -Mode "Off"
+
+            Disable "News and Interests". Changes may not take effect until explorer.exe is restarted.
+
+        .NOTES
+            Doesn't appear to work on 21H2.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param (
+        # News and Interest mode: IconAndText, Icon, or Off
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("IconAndText", "Icon", "Off")]
+        [String]
+        $Mode,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $ShowIconAndText = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $ShowIconOnly = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $Disable = $false,
-        [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer
+        [Switch]
+        $RestartExplorer
     )
 
-    $FeedsKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds"
+    process {
+        $Value = switch ($Mode) {
+            "Off" { 2 }
+            "Icon" { 1 }
+            Default { 0 }   # IconAndText
+        }
 
-    $ViewModeValue = 0
-    if ($ShowIconOnly) {
-        $ViewModeValue = 1
-    } elseif ($Disable) {
-        $ViewModeValue = 2
-    }
+        $FeedsKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Feeds"
+        Set-ItemProperty -Path $FeedsKey -Name "ShellFeedsTaskbarViewMode" -Value $Value -Force
 
-    Set-ItemProperty -Path $FeedsKey -Name "ShellFeedsTaskbarViewMode" -Value $ViewModeValue -Force
-
-    if ($RestartExplorer) {
-        Restart-Explorer
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
     }
 }
 
