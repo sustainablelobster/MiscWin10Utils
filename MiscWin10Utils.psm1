@@ -857,28 +857,123 @@ function Set-NewsAndInterests {
 }
 
 
-function Set-InkWorkspaceButton {
+function Enable-InkWorkspaceButton {
+    <#
+        .SYNOPSIS
+            Show the Ink Workspace button on the Taskbar.
+
+        .DESCRIPTION
+            Show the Ink Workspace button on the Taskbar. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Enable-InkWorkspaceButton -RestartExplorer
+
+            Show Ink Workspace button and restart explorer.exe so changes take effect immediately.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
     param (
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $Enable = $false,
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-InkWorkspaceButton -Value 1 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Disable-InkWorkspaceButton {
+    <#
+        .SYNOPSIS
+            Hide the Ink Workspace button on the Taskbar.
+
+        .DESCRIPTION
+            Hide the Ink Workspace button on the Taskbar. Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Disable-InkWorkspaceButton -RestartExplorer
+
+            Hide Ink Workspace button and restart explorer.exe so changes take effect immediately.
+    #>
+
+    [CmdletBinding()]
+    [OutputType([Void])]
+    param (
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $Disable,
+        [Switch]
+        $RestartExplorer
+    )
+
+    process {
+        Set-InkWorkspaceButton -Value 0 -RestartExplorer:$RestartExplorer
+    }
+}
+
+
+function Set-InkWorkspaceButton {
+    <#
+        .SYNOPSIS
+            Show or hide the Ink Workspace button on the Taskbar.
+
+        .DESCRIPTION
+            Show or Hide the Ink Workspace button on the Taskbar.
+                Value = 0 hides the button
+                Value = 1 shows the button
+                
+            Changes may not take effect until Explorer is restarted.
+
+        .INPUTS
+            None
+        
+        .OUTPUTS
+            None
+
+        .EXAMPLE
+            Set-InkWorkspaceButton -Value 0 -RestartExplorer
+
+            Hide Ink Workspace button and restart explorer.exe so changes take effect immediately.
+
+        .EXAMPLE
+            Set-InkWorkspaceButton -Value 1
+
+            Show Ink Workspace button. Changes may not take effect until explorer.exe is restarted.
+    #>
+
+    param (
+        # 1 to show Ink Workspace button, 0 to hide
+        [Parameter(Mandatory = $true)]
+        [ValidateRange(0, 1)]
+        [Int]
+        $Value,
+        # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
         [switch] $RestartExplorer
     )
 
-    $PenWorkspaceKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PenWorkspace"
+    process {
+        $PenWorkspaceKey = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\PenWorkspace"
+        Set-ItemProperty -Path $PenWorkspaceKey -Name "PenWorkspaceButtonDesiredVisibility" -Value $Value -Force
 
-    $VisibilityValue = 1
-    if ($Disable) {
-        $VisibilityValue = 0
-    }
-
-    Set-ItemProperty -Path $PenWorkspaceKey -Name "PenWorkspaceButtonDesiredVisibility" -Value $VisibilityValue `
-            -Force
-
-    if ($RestartExplorer) {
-        Restart-Explorer
+        if ($RestartExplorer) {
+            Restart-Explorer
+        }
     }
 }
 
