@@ -149,7 +149,8 @@ function Test-EdgeExtensionUrl {
         # URL to test
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [AllowEmptyString()]
-        [String] $Url
+        [String]
+        $Url
     )
 
     process {
@@ -190,7 +191,8 @@ function Test-Url {
         # URL to test
         [Parameter(Mandatory = $true, ValueFromPipeline)]
         [AllowEmptyString()]
-        [String] $Url
+        [String]
+        $Url
     )
 
     begin {
@@ -253,7 +255,8 @@ function Install-VSCodeExtension {
     param (
         # Extension ID or path to local .vsix file
         [Parameter(Mandatory = $true, ValueFromPipeline)]
-        [string] $Extension
+        [String]
+        $Extension
     )
 
     begin {
@@ -313,10 +316,12 @@ function ConvertTo-WSLPath {
     param (
         # Windows path to convert
         [Parameter(Mandatory = $true, ValueFromPipeline)]
-        [String] $Path,
+        [String]
+        $Path,
         # Use the Full switch to get get the full path (default is relative)
         [Parameter(Mandatory = $false)]
-        [Switch] $Full
+        [Switch]
+        $Full
     )
 
     begin {
@@ -367,7 +372,8 @@ function Test-Command {
     param (
         # Command to check
         [Parameter(Mandatory = $true, ValueFromPipeline)]
-        [String] $Name
+        [String]
+        $Name
     )
 
     begin {
@@ -719,7 +725,7 @@ function Set-CortanaButton {
         $Value,
         # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] 
+        [Switch] 
         $RestartExplorer
     )
 
@@ -992,7 +998,8 @@ function Set-InkWorkspaceButton {
         $Value,
         # Restart explorer.exe to allow changes to take effect
         [Parameter(Mandatory = $false)]
-        [switch] $RestartExplorer
+        [Switch]
+        $RestartExplorer
     )
 
     process {
