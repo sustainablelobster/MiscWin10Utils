@@ -21,6 +21,8 @@ function Install-Boxstarter {
 
         .LINK
             https://boxstarter.org/
+
+        .LINK
             https://boxstarter.org/installboxstarter#installing-from-the-web
     #>
 
@@ -67,7 +69,11 @@ function Install-EdgeExtension {
 
         .LINK
             https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home
+
+        .LINK
             https://chrome.google.com/webstore/category/extensions
+
+        .LINK
             edge://extensions
     #>
 
@@ -129,7 +135,11 @@ function Test-EdgeExtensionUrl {
 
         .LINK
             Test-Url
+        
+        .LINK
             https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home
+
+        .LINK
             https://chrome.google.com/webstore/category/extensions
     #>
 
@@ -232,8 +242,9 @@ function Install-VSCodeExtension {
             Install the "Python" extension by Microsoft from a local .vsix file.
 
         .LINK
-            code --help
             https://marketplace.visualstudio.com/vscode
+
+        .LINK
             https://code.visualstudio.com/
     #>
 
@@ -294,8 +305,6 @@ function ConvertTo-WSLPath {
             Get WSL paths for every item in the current directory.
 
         .LINK
-            wsl wslpath
-            wsl --help
             https://docs.microsoft.com/en-us/windows/wsl/about
     #>
 
@@ -523,6 +532,8 @@ function Set-ExplorerQuickAccess {
 
         .LINK
             Enable-ExplorerQuickAccess
+
+        .LINK
             Disable-ExplorerQuickAccess
     #>
 
@@ -693,6 +704,8 @@ function Set-CortanaButton {
 
         .LINK
             Enable-CortanaButton
+
+        .LINK
             Disable-CortanaButton
     #>
 
@@ -964,6 +977,8 @@ function Set-InkWorkspaceButton {
 
         .LINK
             Enable-InkWorkspaceButton
+
+        .LINK
             Disable-InkWorkspaceButton
     #>
 
@@ -1140,6 +1155,8 @@ function Set-AutoAccentColor {
 
         .LINK
             Enable-AutoAccentColor
+
+        .LINK
             Disable-AutoAccentColor
     #>
 
@@ -1189,7 +1206,11 @@ function Enable-AppLightTheme {
 
         .LINK
             Enable-AppDarkTheme
+
+        .LINK
             Enable-SystemLightTheme
+
+        .LINK
             Enable-SystemDarkTheme
     #>
 
@@ -1229,7 +1250,11 @@ function Enable-AppDarkTheme {
 
         .LINK
             Enable-AppLightTheme
+
+        .LINK
             Enable-SystemLightTheme
+
+        .LINK
             Enable-SystemDarkTheme
     #>
 
@@ -1269,7 +1294,11 @@ function Enable-SystemLightTheme {
 
         .LINK
             Enable-SystemDarkTheme
+
+        .LINK
             Enable-AppLightTheme
+
+        .LINK
             Enable-AppDarkTheme
     #>
 
@@ -1309,7 +1338,11 @@ function Enable-SystemDarkTheme {
 
         .LINK
             Enable-SystemLightTheme
+
+        .LINK
             Enable-AppLightTheme
+
+        .LINK
             Enable-AppDarkTheme
     #>
 
@@ -1423,10 +1456,20 @@ function Set-PersonlizeKeyValue {
 
         .LINK
             Enable-AppLightTheme
+
+        .LINK
             Enable-AppDarkTheme
+
+        .LINK
             Enable-SystemLightTheme
+
+        .LINK
             Enable-SystemDarkTheme
+
+        .LINK
             Enable-TransparencyEffects
+
+        .LINK
             Disable-TransparencyEffects
     #>
 
@@ -1637,6 +1680,8 @@ function Set-DesktopRecycleBin {
 
         .LINK
             Enable-DesktopRecycleBin
+
+        .LINK
             Disable-DesktopRecycleBin
     #>
 
