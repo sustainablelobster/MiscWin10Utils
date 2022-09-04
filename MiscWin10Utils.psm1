@@ -1052,7 +1052,7 @@ function Set-WallpaperQuality {
     )
 
     process {
-        $DesktopKey = "HKCU:\SOFTWARE\Control Panel\Desktop"
+        $DesktopKey = "HKCU:\Control Panel\Desktop"
         Set-ItemProperty -Path $DesktopKey -Name "JPEGImportQuality" -Value $Quality -Force
 
         if ($RestartExplorer) {
